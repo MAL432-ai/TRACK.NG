@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 
+const API_BASE_URL = typeof window !== "undefined" ? (window.ENV?.NEXT_PUBLIC_API_BASE_URL || "https://trackng-api.onrender.com") : "https://trackng-api.onrender.com";
+
 export default function Home() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [loading, setLoading] = useState(false);
@@ -20,8 +22,7 @@ export default function Home() {
 
   const fetchSubmissions = async () => {
     try {
-      console.log("Fetching submissions...");
-      const response = await axios.get("http://localhost:5000/api/submissions", {
+      const response = await axios.get(`${API_BASE_URL}/api/submissions`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -43,8 +44,7 @@ export default function Home() {
     setSuccessMessage("");
     setErrorMessage("");
     try {
-      console.log("Submitting form with data:", formData);
-      await axios.post("http://localhost:5000/api/contact", formData, {
+      await axios.post(`${API_BASE_URL}/api/contact`, formData, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -66,11 +66,9 @@ export default function Home() {
   );
 
   const sortedSubmissions = [...filteredSubmissions].sort((a, b) => {
-    if (sortOrder === "asc") {
-      return new Date(a.submittedAt) - new Date(b.submittedAt);
-    } else {
-      return new Date(b.submittedAt) - new Date(a.submittedAt);
-    }
+    return sortOrder === "asc"
+      ? new Date(a.submittedAt) - new Date(b.submittedAt)
+      : new Date(b.submittedAt) - new Date(a.submittedAt);
   });
 
   return (
